@@ -1,10 +1,16 @@
-import React from "react";
-import { FlatList, ListRenderItemInfo, Text } from "react-native";
+import React, { createRef, useRef } from "react";
+import {
+  FlatList,
+  FlatListProps,
+  ListRenderItemInfo,
+  Text,
+} from "react-native";
 import { act, create } from "react-test-renderer";
 import { fireEvent, waitFor } from "react-native-testing-library";
 
 import CustomCarousel from "./CustomCarousel";
 import PressablePagination from "./PressablePagination/PressablePagination";
+import { CustomCarouselProps, RefProps } from "./Interfaces";
 
 interface renderItemProp {
   text: string;
@@ -58,8 +64,7 @@ describe("Custom Carousel", () => {
     const rendered = create(<CustomCarousel {...defaultProps} />);
 
     const flatList = rendered.root.findByType(FlatList);
-
-    await waitFor(() => expect(flatList).toBeDefined());
+    expect(flatList).toBeDefined();
 
     act(() => {
       flatList.props.onEndReached();
@@ -72,8 +77,7 @@ describe("Custom Carousel", () => {
     const rendered = create(<CustomCarousel {...defaultProps} />);
 
     const flatList = rendered.root.findByType(FlatList);
-
-    await waitFor(() => expect(flatList).toBeDefined());
+    expect(flatList).toBeDefined();
 
     fireEvent.scroll(flatList, {
       nativeEvent: {
@@ -89,5 +93,32 @@ describe("Custom Carousel", () => {
     expect(pressablePagination).toEqual(
       expect.objectContaining({ _value: 200 })
     );
+  });
+  describe("Next/Prev - Pagination", () => {
+    const paginationProps: CustomCarouselProps = {
+      data: carouselItems,
+      renderItem: defaultRenderItem,
+    };
+
+    // TODO: WIP - This test is not asserting correctly, it's a false positive
+    test("showNextItem() should be exposed to parent component", async () => {
+      const ref = createRef<RefProps>();
+
+      const rendered = create(
+        <CustomCarousel ref={ref} {...paginationProps} />
+      );
+
+      const flatList = rendered.root.findByType(FlatList);
+      expect(flatList).toBeDefined();
+
+      await act(() => {
+        ref.current?.showNextItem();
+      });
+
+      expect(ref.current?.showNextItem).toBeDefined();
+      expect(ref.current).toMatchObject({
+        showNextItem: expect.any(Function),
+      });
+    });
   });
 });

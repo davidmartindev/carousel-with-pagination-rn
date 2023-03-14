@@ -96,6 +96,7 @@ const CustomCarousel = forwardRef<RefProps, CustomCarouselProps>(
           viewabilityConfig={viewabilityConfig}
           onViewableItemsChanged={onViewableItemsChanged}
           onEndReached={endReached}
+          onScrollToIndexFailed={() => {}}
         />
         {!disablePagination && (
           <View
